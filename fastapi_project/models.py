@@ -3,13 +3,16 @@ from sqlalchemy import Column,Integer,String,Boolean,DateTime
 from database import session_local
 from fastapi import HTTPException
 from passlib.context import CryptContext
-
+import jwt
 
 SECRET_KEY ="b360aa7d2fa355afa670ad2480d0b18d931a4f1049413230c6020f5731345f44"
+KEY='931158734c8d577bbaa24749957d4ef1'
 ALGORITHM = "HS256"
 ACCESS_TOKEN_EXPIRE_MINUTES = 30
 
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
+
+
 class User(Base):
     __tablename__="User"
     id = Column("User_ID",Integer,primary_key=True,index=True)
@@ -22,6 +25,7 @@ class User(Base):
 
     def __init__(self,**kwargs):
         super().__init__(**kwargs)
+        self.username=self.username.strip().upper()
         self.email= self.email.strip().lower()
         self.password=self.hashpassword()
 
@@ -36,10 +40,7 @@ class User(Base):
     def hashpassword(self):
         return pwd_context.hash(self.password)
 
-    @classmethod
-    def verify(cls,instance):
-        return pwd_context.verify(self.password,instance.password)
-
+   
     @classmethod 
     def converttoobject(cls,obj):
         return cls (**obj.dict())   
@@ -53,7 +54,7 @@ class User(Base):
                 session.add(userinstance)
                 session.commit()
                 session.refresh(userinstance)
-                return {"status": 200, "detail": "User created successfully"}
+                return HTTPException(status_code=200,detail="User created")
             except Exception as e:
                 session.rollback()
                 raise HTTPException(status_code=500, detail=str(e))
