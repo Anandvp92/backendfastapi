@@ -15,7 +15,7 @@ class User(Base):
     id = Column("User_ID",Integer,primary_key=True,index=True)
     username=Column("Username",String(225),unique=True,nullable=False)
     email=Column("Email",String(225),unique=True,nullable=False)
-    phonenumber=Column("Phone_number",Integer,unique=True,nullable=False)
+    phonenumber=Column("Phonenumber",Integer,unique=True,nullable=False)
     password=Column("Password",String(50))
     is_admin=Column("Is_admin",Boolean,default=False)
     is_staff=Column("Is_staff",Boolean,default=True)
@@ -44,29 +44,28 @@ class User(Base):
     def converttoobject(cls,obj):
         return cls (**obj.dict())   
 
-
     @classmethod
-    def create(cls,userinstance):
-        session=session_local()
+    def create(cls, userinstance):
+        session=next(cls.db())
         userinstance=cls(**userinstance.dict())
         if userinstance:
-                try:
-                    session.add(userinstance)
-                    session.commit()
-                    session.refresh(userinstance)
-                    return HTTPException(status_code=200,detail="User created sucessfully")
-                except Exception as e:
-                    session.rollback()
-                    raise e
-                finally:
-                    session.close()
-
+            try:
+                session.add(userinstance)
+                session.commit()
+                session.refresh(userinstance)
+                return {"status": 200, "detail": "User created successfully"}
+            except Exception as e:
+                session.rollback()
+                raise HTTPException(status_code=500, detail=str(e))
+            finally:
+                session.close()
         else:
-            return  HTTPException(status_code=200,detail="Something went Wrong")
+            raise HTTPException(status_code=400, detail="Invalid user data")
+
 
     def userexist(self):
         session = next(self.db())
-        return "User exists" if session.query(User).filter(User.username==self.username).scalar() else "Not"
+        return HTTPException( status_code=204, detail="User exists" ) if session.query(User).filter(User.username==self.username).scalar() else HTTPException(status_code=404,detail="User Not not found")
 
 
 Base.metadata.create_all(engine)

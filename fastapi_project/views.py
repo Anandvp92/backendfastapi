@@ -8,9 +8,8 @@ from sqlalchemy.orm import Session
 
 @app.post("/createuser/")
 async def createuser(user:UserModel):
-        User.create(userinstance=user)
-        return HTTPException(status_code=200 , detail="User created")
-        
+       return User.create(user)
+      
 @app.get("/listusers/")
 async def listuser(user:UserModel,db: Session = Depends(User.db)):
     if User.verify(user):

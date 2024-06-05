@@ -1,22 +1,22 @@
 from pydantic import BaseModel,ValidationError,validator,EmailStr
+from typing import Optional
 
 
 class UserModel(BaseModel):
-    username:str|None=None
-    email:EmailStr
-    phonenumber:int 
-    password:str|None=None
+    username: Optional[str] = None
+    email: EmailStr
+    phonenumber: int
+    password: Optional[str] = None
 
-    @classmethod
     @validator("email")
-    def email_validator(cls,instance):
-        if not instance and not instance.endswith("@example.com"):
+    def email_validator(cls, value):
+        if not value.endswith("@example.com"):
             raise ValueError("Email is not a valid one")
-        return instance
+        return value
 
     @validator("phonenumber")
-    def phonenumber_validator(cls,instance):
-        str_value=str(instance)
-        if len(str_value)!=10:
-            raise ValueError("Phone number is not valid")
-        return instance
+    def phonenumber_validator(cls, value):
+        str_value = str(value)
+        if len(str_value) != 10 or not str_value.isdigit():
+            raise ValueError("Phone number must be a 10-digit number")
+        return value
