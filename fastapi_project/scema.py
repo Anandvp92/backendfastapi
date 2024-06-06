@@ -5,7 +5,7 @@ import re
 class UserModel(BaseModel):
     username: Optional[str] = None
     email: EmailStr
-    phonenumber: int |None="8888888888"
+    phonenumber: Optional[int] =None
     password: Optional[str] = None
 
     @validator("email")
@@ -20,3 +20,13 @@ class UserModel(BaseModel):
         if not re.compile(r'^\d{10}$').match(str_value):
             raise ValueError("Phone number must be a 10-digit number")
         return value
+
+
+class LoginModel(BaseModel):
+    email:EmailStr|None=None
+    password:str |None=None
+
+
+class Token(BaseModel):
+    acess_token:str
+    token_type:str
