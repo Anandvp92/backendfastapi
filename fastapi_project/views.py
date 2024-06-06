@@ -1,5 +1,5 @@
 from main import app
-from scema import UserModel,LoginModel
+from scema import UserModel,LoginModel,UpdateuserModel
 from models import User
 from database import session_local
 from fastapi import HTTPException ,Depends
@@ -31,13 +31,17 @@ async def login_user(user:LoginModel):
 
 @app.delete("/deleteuser/{id}")
 async def deleteuser(id:int):
-        db=next(User.db())
-        user=db.query(User).filter(User.id==id).first()
-        if user:
-            db.delete(user)
-            db.commit()
-            return HTTPException(status_code=200,detail={"msg":"User deleted"})
-        else:
-            return HTTPException(status_code=204,detail={"msg":"User not found"})
+      return await User.deleteuser(id)
 
 
+@app.put("/updateuser/")
+async def updateuser(userupdate:UpdateuserModel):
+     session=session_local()
+     user = session.query(User).filter(User.id==userupdate.id).first()
+     if user:
+          userdata=userupdate.dict(exclude_unset=True)
+          _=[ setattr (user,key ,value)  for key ,value in userupdate.dict(exclude_unset=True).items()  ]
+          session.commit()
+          return HTTPException(status_code=200,detail="User is updated")
+     else:
+          return HTTPException(status_code=404,detail="User not found",headers={"msg":[]})

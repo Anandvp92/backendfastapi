@@ -54,7 +54,7 @@ class User(Base):
     def hashpassword(self):
         return pwd_context.hash(self.password)
 
-    #db_dependency=Annotated(Session,Depends(db))
+
 
     @classmethod
     def verfiy_password(cls,obj):
@@ -99,7 +99,21 @@ class User(Base):
         session = next(self.db())
         return HTTPException( status_code=204, detail="User exists" ) if session.query(User).filter(User.username==self.username).scalar() else HTTPException(status_code=404,detail="User Not not found")
 
-
+    @staticmethod
+    def deleteuser(id):
+        try:
+            if id:
+                session=next(User.db())
+                user=session.query(User).filter(User.id==id).first()
+                if user:
+                    session.delete(user)
+                    session.commit()
+                    return HTTPException(status_code=200,detail="User has been deleted",headers={"msg":[]})
+                else:
+                    return HTTPException(status_code=404,detail="User not found")
+        except Exception as e:
+            return HTTPException(status_code=404,detail=f"{e}")
+            
 Base.metadata.create_all(engine)
 
 
