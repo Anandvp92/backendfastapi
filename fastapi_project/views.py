@@ -45,3 +45,6 @@ async def updateuser(userupdate:UpdateuserModel):
           return HTTPException(status_code=200,detail="User is updated")
      else:
           return HTTPException(status_code=404,detail="User not found",headers={"msg":[]})
+
+
+
