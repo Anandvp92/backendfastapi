@@ -9,16 +9,6 @@ from typing import Annotated
 
 
 
-SECRET_KEY ="b360aa7d2fa355afa670ad2480d0b18d931a4f1049413230c6020f5731345f44"
-KEY='931158734c8d577bbaa24749957d4ef1'
-ALGORITHM = "HS256"
-ACCESS_TOKEN_EXPIRE_MINUTES = 30
-
-# router = APIRouter(
-#     prefix="/auth",
-#     tags=['auth']
-# )
-
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 
 

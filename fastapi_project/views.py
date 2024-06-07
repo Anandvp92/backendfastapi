@@ -5,13 +5,21 @@ from database import session_local
 from fastapi import HTTPException ,Depends
 from sqlalchemy.orm import Session
 from fastapi import Depends
+from jose import jwt,JWTError
+
+SECRET_KEY ="b360aa7d2fa355afa670ad2480d0b18d931a4f1049413230c6020f5731345f44"
+KEY='931158734c8d577bbaa24749957d4ef1'
+ALGORITHM = "HS256"
+ACCESS_TOKEN_EXPIRE_MINUTES = 30
 
 
-@app.post("/createuser/")
+
+
+@app.post("/createuser/",tags=["Create User"])
 async def createuser(user:UserModel):
        return User.create(user)
       
-@app.get("/listusers/")
+@app.get("/listusers/",tags=["List user"])
 async def listuser(db: Session = Depends(User.db)):
         allusers=db.query(User).all()
         if allusers:
@@ -19,22 +27,22 @@ async def listuser(db: Session = Depends(User.db)):
         else:
             return HTTPException(status_code=404,detail="No user's")
 
-@app.post("/checkuser/")
+@app.post("/checkuser/",tags=["Checking User"])
 async def checkuser(user:UserModel):
     newuser=User.converttoobject(obj=user)
     return newuser.userexist()
 
-@app.post("/login/")
+@app.post("/login/",tags=["User Login"])
 async def login_user(user:LoginModel):
     return await User.verfiy_password(obj=user)
 
 
-@app.delete("/deleteuser/{id}")
+@app.delete("/deleteuser/{id}",tags=["Delete User"])
 async def deleteuser(id:int):
       return await User.deleteuser(id)
 
 
-@app.put("/updateuser/")
+@app.put("/updateuser/",tags=["Update User"])
 async def updateuser(userupdate:UpdateuserModel):
      session=session_local()
      user = session.query(User).filter(User.id==userupdate.id).first()
@@ -46,5 +54,11 @@ async def updateuser(userupdate:UpdateuserModel):
      else:
           return HTTPException(status_code=404,detail="User not found",headers={"msg":[]})
 
+@app.get("/checkjwt/")
+def checkjwt():
+    token = jwt.encode({'key': 'value'}, key= SECRET_KEY, algorithm=ALGORITHM)
+    updatetoken=jwt.decode(token,key=SECRET_KEY,algorithms=ALGORITHM)
+    return updatetoken
+    
 
 
