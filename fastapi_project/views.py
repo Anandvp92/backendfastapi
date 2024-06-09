@@ -39,7 +39,7 @@ async def login_user(user:LoginModel):
 
 @app.delete("/deleteuser/{id}",tags=["Delete User"])
 async def deleteuser(id:int):
-      return await User.deleteuser(id)
+      return  User.deleteuser(id)
 
 
 @app.put("/updateuser/",tags=["Update User"])
